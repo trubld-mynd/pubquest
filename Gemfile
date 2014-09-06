@@ -4,6 +4,10 @@ ruby '1.9.3'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.4'
 
+## Bootstap-sass and sprockets gems for CSS formatting (Twitter gems)
+gem 'bootstrap-sass', '2.3.2.0'
+gem 'sprockets', '2.11.0'
+
 # Install tzinfo-data gem to help generate StaticPages controller
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 # Use sqlite3 as the database for Active Record
