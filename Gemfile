@@ -8,6 +8,9 @@ gem 'rails', '4.1.4'
 gem 'bootstrap-sass', '2.3.2.0'
 gem 'sprockets', '2.11.0'
 
+## gmaps4rails for the map on the pubquest homepage
+gem 'gmaps4rails'
+
 # Install tzinfo-data gem to help generate StaticPages controller
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 # Use sqlite3 as the database for Active Record
