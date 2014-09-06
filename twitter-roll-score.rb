@@ -11,7 +11,7 @@ require './config/environment'
 class TwitterDM
     def initialize()
         t = Time::new
-        $t_end = Time.new(2014,9,6,20,00,0,"+10:00")
+        $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
 
         directmessages = ["Welcome to the Pub Quest 2014! Use twitter to play by texting your drink count at each pub (max 4) WITH A PHOTO to @pubquestbot.", 
             "For example, if you've had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!", 
@@ -140,9 +140,9 @@ baseurl = "https://api.twitter.com"
 keywords = ["pubquestbot", "drinks"]
 
 ## Establish Bar Locations
-bars = [0,1,2,6,2,5,6,7,11,9,10,11,7,13]
-barnames = ["Start", "Bar 1", "Bar2", "Bar 333", "Bar 4", "Bar Five", "Bar666", "Bar 7", "Bar Eight", "Nine9", "Ten", "Bar Eleven", "Bar 12", "Bar 13"]
-barsnls = ["Start","A slow start to ","Go on to ","LADDER! Go straight to ","SNAKE! Go back to ","Move on to ","Head to ","Go on to ","LADDER! Go straight to ","Dance on to ","Rock on to ","Nearly there! Go to ","SNAKE! (Oooh so close!) Go back to ","The end in sight! Go to "]
+bars = [0,1,4,3,4,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
+barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Ivy (or Felix/Ash St)", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
+barsnls = ["Start","Go on to ", "LADDER! Go straight to ", "Go on to ", "Go on to ", "LADDER! Go straight to ", "Go on to ", "Go on to ", "LADDER! Go straight to ", "LADDER! Go straight to ", "SNAKE! Go back to ", "Le stop at ", "Party on to ", "Go on to ", "Pop into ", "SNAKE! Go back to ", "LADDER! Go straight to ", "Head down to ", "Go on to ", "Have a drink around ", "Stop in at ", "SNAKE! Go back to ", "Go on to ", "LADDER! Go straight to ", "Tune up at ", "Party on to ", "SNAKE! Go back to ", "Nearly there! Go on to ", "Nearly there! Go on to ", "SNAKE! (So close!) Go back to ", "You made it! Go to "]
 
 
 ## Get User current position from Pubquestbot's 
@@ -233,7 +233,7 @@ if response.code == '200' then
         if users_last_time[name] == 0 || (tweet_t > (users_last_time[name] + (60 * 20))) 
 
             if tweet_t < ($t_end - 160) && (users_score[name]) == 0
-                tweetout << "@#{name} Go to the first bar at #{barnames[1]} - # 1"
+                tweetout << "@#{name} Start the quest at #{barnames[1]} - # 1"
             end
         ## puts tweet["user"]["screen_name"] + " - " + tweet["text"]
         ## ^ Removed because list of tweets is flooding heroku logs
