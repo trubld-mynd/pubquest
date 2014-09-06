@@ -3,6 +3,9 @@ ruby '1.9.3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.4'
+# Use postgresql as the database for Active Record
+## Twitterbot requires this for Heroku 
+gem 'pg'
 
 ## Bootstap-sass and sprockets gems for CSS formatting (Twitter gems)
 gem 'bootstrap-sass', '2.3.2.0'
@@ -10,6 +13,12 @@ gem 'sprockets', '2.11.0'
 
 ## gmaps4rails for the map on the pubquest homepage
 gem 'gmaps4rails'
+
+## These gems for the twitterbot ruby file
+gem 'clockwork'
+gem 'oauth'
+gem 'json'
+gem 'delayed_job_active_record'
 
 # Install tzinfo-data gem to help generate StaticPages controller
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
@@ -36,6 +45,6 @@ group :doc do
 end
 
 group :production do
-  gem 'pg', '0.15.1'
+
   gem 'rails_12factor', '0.0.2'
 end
