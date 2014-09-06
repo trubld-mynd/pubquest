@@ -213,7 +213,7 @@ tweets = nil
 tweet_t = nil
 if response.code == '200' then
   tweets = JSON.parse(response.body)
-    tweets.reverse_each do |tweet|
+    tweets.each do |tweet|
         tweetout = nil
         rollcount = 0
         rollout = Array.new
