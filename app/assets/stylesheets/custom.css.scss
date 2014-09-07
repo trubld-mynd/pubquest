@@ -68,10 +68,6 @@ i {
   color: $grayDarker
 }
 
-span {
-  font-size: 0.9em
-}
-
 /* header */
 
 #logo {
@@ -86,7 +82,7 @@ span {
   font-weight: bold;
   line-height: 1;
   &:hover {
-    color: white;
+    color: yellow;
     text-decoration: none;
   }
 }
