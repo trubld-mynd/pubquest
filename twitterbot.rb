@@ -14,15 +14,15 @@ class TwitterDM
     def initialize()
         t = Time::new
         
-    directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me @pubquestbot", 
-    "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!", 
-    "You move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2,3 or 4 spaces on the board!",
-    "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
-    "I'll only accept tweets every 20 minutes. After 20 mins has past, you have a 15 minute window for your next tweet to be read & dice rolled.",
-    "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
-    "Check out the Snakes N Ladders map at the website http://www.pubquest.info",
-    "LET THE GAMES BEGIN!",
-    "The pubquest is over! Come to Frankie's Pizza for celebratory drinks!"]
+    directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me @pubquestbot",
+        "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
+        "You move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2,3 or 4 spaces on the board!",
+        "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
+        "I'll only accept tweets every 20 minutes. After 20 mins has past, you have a 15 minute window for your next tweet to be read & dice rolled.",
+        "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
+        "Check out the Snakes N Ladders map at the website http://www.pubquest.info",
+        "LET THE GAMES BEGIN!",
+        "The pubquest is over! Come to Frankie's Pizza for celebratory drinks!"]
 
 ## Verify connection to Twitter API
 consumer_key = OAuth::Consumer.new(
