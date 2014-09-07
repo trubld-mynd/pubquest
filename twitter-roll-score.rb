@@ -213,7 +213,7 @@ tweets = nil
 tweet_t = nil
 if response.code == '200' then
   tweets = JSON.parse(response.body)
-    tweets.each do |tweet|
+    tweets.reverse_each do |tweet|
         tweetout = nil
         rollcount = 0
         rollout = Array.new
@@ -230,7 +230,7 @@ if response.code == '200' then
         time_arr.insert(3, time_time[0].to_i, time_time[1].to_i, time_time[2].to_i)
         tweet_t = Time.new(time_arr[7].to_i,Date::ABBR_MONTHNAMES.index(time_arr[1]),time_arr[2].to_i,time_arr[3],time_arr[4],time_arr[5])
         
-        if users_last_time[name] == 0 || (tweet_t > (users_last_time[name] + (60 * 20))) 
+        if users_last_time[name] == 0 || (tweet_t > (users_last_time[name] + (60 * 20)) && tweet_t < (users_last_time[name] + (60 * 35) ) 
 
             if tweet_t < ($t_end - 160) && (users_score[name]) == 0
                 tweetout << "@#{name} Start the quest at #{barnames[1]} - # 1"
