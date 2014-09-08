@@ -9,12 +9,7 @@ require './config/boot'
 require './config/environment'
 
 $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
-
-class TwitterDM
-    def initialize()
-        t = Time::new
-        
-    $directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me @pubquestbot",
+$directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me @pubquestbot",
         "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
         "You move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2,3 or 4 spaces on the board!",
         "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
@@ -24,7 +19,23 @@ class TwitterDM
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
 
-## Verify connection to Twitter API
+$names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning"]
+$users_list = Hash[$names.map{|user| [user, 0]}]
+$users_score = Hash[$names.map{|user| [user, 0]}]
+$users_last_time = Hash[$names.map{|user| [user, 0]}]
+users_last_location = Hash[$names.map{|user| [user, 0]}]
+
+
+$bars = [0,1,4,3,4,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
+$barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Ivy (or Felix/Ash St)", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
+$barsnls = ["Start","Go on to ", "LADDER! Go straight to ", "Go on to ", "Go on to ", "LADDER! Go straight to ", "Go on to ", "Go on to ", "LADDER! Go straight to ", "LADDER! Go straight to ", "SNAKE! Go back to ", "Le stop at ", "Party on to ", "Go on to ", "Pop into ", "SNAKE! Go back to ", "LADDER! Go straight to ", "Head down to ", "Go on to ", "Have a drink around ", "Stop in at ", "SNAKE! Go back to ", "Go on to ", "LADDER! Go straight to ", "Tune up at ", "Party on to ", "SNAKE! Go back to ", "Nearly there! Go on to ", "Nearly there! Go on to ", "SNAKE! (So close!) Go back to ", "You made it! Go to "]
+
+
+class TwitterDM
+    def initialize()
+        t = Time::new
+        
+    ## Verify connection to Twitter API
 consumer_key = OAuth::Consumer.new(
 "lZLYSIi4dbgIN9yRzTcIeP8Fk",
 "3BqN9Qz9iVdYpPKJxXR0hjuaC1KXXPc03lIv02PyZGnXo5CRhR")
@@ -123,12 +134,6 @@ puts t
 
 ## Establish Users
  
-names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning"]
-users_list = Hash[names.map{|user| [user, 0]}]
-$users_score = Hash[names.map{|user| [user, 0]}]
-$users_last_time = Hash[names.map{|user| [user, 0]}]
-users_last_location = Hash[names.map{|user| [user, 0]}]
-
 ## Verify connection to Twitter API
 consumer_key = OAuth::Consumer.new(
 "lZLYSIi4dbgIN9yRzTcIeP8Fk",
@@ -142,10 +147,6 @@ baseurl = "https://api.twitter.com"
 keywords = ["pubquestbot", "drinks"]
 
 ## Establish Bar Locations
-bars = [0,1,4,3,4,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
-barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Ivy (or Felix/Ash St)", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
-barsnls = ["Start","Go on to ", "LADDER! Go straight to ", "Go on to ", "Go on to ", "LADDER! Go straight to ", "Go on to ", "Go on to ", "LADDER! Go straight to ", "LADDER! Go straight to ", "SNAKE! Go back to ", "Le stop at ", "Party on to ", "Go on to ", "Pop into ", "SNAKE! Go back to ", "LADDER! Go straight to ", "Head down to ", "Go on to ", "Have a drink around ", "Stop in at ", "SNAKE! Go back to ", "Go on to ", "LADDER! Go straight to ", "Tune up at ", "Party on to ", "SNAKE! Go back to ", "Nearly there! Go on to ", "Nearly there! Go on to ", "SNAKE! (So close!) Go back to ", "You made it! Go to "]
-
 
 ## Get User current position from Pubquestbot's 
 ## previous instruction tweets 
@@ -191,7 +192,7 @@ puts "users_score = " + $users_score.to_s
 ## Run the search & tweet script for all 
 ## users in the user_list
 
-users_list.each do |name, number|
+$users_list.each do |name, number|
     puts "New loop: " + name
     name_freeze = name.freeze
 ## Search User Timelines
@@ -236,7 +237,7 @@ if response.code == '200' then
         if ($users_score[name].to_i == 0 || $users_score[name] == "") || (tweet_t > ($users_last_time[name] + (60 * 20)) && tweet_t < ($users_last_time[name] + (60 * 35)))
          
             if tweet_t == nil || (tweet_t < ($t_end - 160) && ($users_score[name].to_i) == 0)
-                $tweetout << "@#{name} Start the quest at #{barnames[1]} - # 1"
+                $tweetout << "@#{name} Start the quest at #{$barnames[1]} - # 1"
                 $users_score[name_freeze] = 1
                 $users_last_time[name_freeze] = Time.new
             end
@@ -268,13 +269,13 @@ if response.code == '200' then
                 when 1 then ", but Pubquestbot gives you +1! "
                 else ". "
             end
-            go_to_bar = bars[[($users_score[name] + roll), 30].min]
-            go_to_barname = barnames[go_to_bar]
-            go_to_bartalk = barsnls[($users_score[name] + roll)]
+            go_to_bar = $bars[[($users_score[name] + roll), 30].min]
+            go_to_barname = $barnames[go_to_bar]
+            go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
             $tweetout << "@#{name} You're on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
-            users_last_time[name_freeze] = tweet_t
+            $users_last_time[name_freeze] = tweet_t
             rollcount += 1
             
             else if word.to_i != 0 && rollcount == 0 && pic
@@ -286,13 +287,13 @@ if response.code == '200' then
                 when 1 then " Pubquestbot gives you +1! "
                 else ". "
             end
-            go_to_bar = bars[[($users_score[name] + roll), 30].min]
-            go_to_barname = barnames[go_to_bar]
-            go_to_bartalk = barsnls[($users_score[name] + roll)]
+            go_to_bar = $bars[[($users_score[name] + roll), 30].min]
+            go_to_barname = $barnames[go_to_bar]
+            go_to_bartalk = $barsnls[($users_score[name] + roll)]
             $tweetout << "@#{name} Drink count is maxed at 4#{botroll_talk}Your roll is #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             
             $users_score[name_freeze] = go_to_bar.to_i
-            users_last_time[name_freeze] = tweet_t
+            $users_last_time[name_freeze] = tweet_t
             rollcount += 1
             
             # end of else if word.to_i != 0
@@ -333,7 +334,7 @@ if response.code == '200' then
               "Code:#{response.code} Body:#{response.body}"
             end
         
-        puts $tweetout[0]
+        puts "tweetout = " + $tweetout[0]
         puts "Users_score: " + name + " = " + $users_score[name].to_s
                 
             # end of if tweet_t < users_last_time[name] && tweet_t < t
