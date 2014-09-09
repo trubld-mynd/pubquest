@@ -11,14 +11,21 @@
  </h2>
  <h2><b>"@pubquestbot <i>n</i> drinks"</b></h2>
 	<span style="font-size: 0.9em"><br>where <i>n</i> is the number of drinks your team had in that pub (maximum 4 drinks per pub)</span>
-  <p>The challenge ends at <%= 
+  <p>The challenge ends at<%= 
 	require 'twitterbot2.rb'
-  $t_end.strftime "%H:%M %Y-%m-%d" %></p>
+  $t_end_local.strftime(" %I:%M%p") %></p>
   <div style='width: 95%; margin-left: auto; margin-right: auto;'>
   	<div id='sidebar_builder' style='width: 95%; height: 800px;'></div>
   </div><br>
-  <div id='sidebar_container' style="text-align: left">
+  <div id='sidebar_container' style="text-align: left; clear: both; float: left"><h1>Bar List</h1>
 </div>
+<div style="position: relative; float: right">
+	<h1>Team List</h1><br>
+	<%	require 'twitterbot2.rb' 
+  $users_score.each do |name, score| %>
+  	<%= name %> - <%= score %><br>
+  	<% end %><br>
+	</div>
 
 <script type="text/javascript">
 function createSidebarLi(json){

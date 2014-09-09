@@ -13,14 +13,14 @@ $t_start_local = $t_start.localtime("+10:00")
 $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
 $t_end_local = $t_end.localtime("+10:00") 
 $startmessages = ["Hi there...",
-    "Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me '@pubquestbot'", 
+    "Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet me your drink count at each pub (max 4) AND A PHOTO", 
        # "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
        # "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
        # "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
        # "I'll only accept tweets every 20 minutes. After 20 mins has past, you have a 15 minute window for your next tweet to be read & dice rolled.",
        # "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
         "For this test, I will start the pubquest at#{$t_start_local.strftime(" %I:%M%p")} and finish at#{$t_end_local.strftime(" %I:%M%p")} local time.",
-        #{}"Check out the Snakes N Ladders map at the website http://www.pubquest.info",
+        # "Check out the Snakes N Ladders map at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
 $directmessages = Hash[$startmessages.map{|msg| [msg, 0]}]
@@ -286,9 +286,9 @@ if response.code == '200' then
         $tweetout << "@#{name} No dice! Pics or it didn't happen!" if (pic == false)
   
         if tweet_t < ($t_start + 60*20) 
-                $tweetout << "@#{name} Too early! Tweet to me again in #{t_go} minutes"
+                $tweetout << "@#{name} That tweet is #{t_go} minutes too early! Tweet to me again later"
                 elsif ($users_last_time[name] != 0 && tweet_t < ($users_last_time[name] + (60 * 20)))
-                $tweetout << "@#{name} Too early! Tweet to me again in #{t_go} minutes"
+                $tweetout << "@#{name} That tweet is #{t_go} minutes too early! Tweet to me again later"
             #end of if tweet_t < ($t_start + 60*20)
             end
         ## SPLIT TWEET UP INTO WORDS 
