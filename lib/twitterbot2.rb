@@ -8,9 +8,9 @@ require 'clockwork'
 require './config/boot'
 require './config/environment'
 
-$t_start = Time.new(2014,9,9,12,00,0,"+10:00")
-$t_end = Time.new(2014,9,12,20,00,0,"+10:00")
-$startmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me pubquestbot", 
+$t_start = Time.new(2014,9,9,2,00,0,"+00:00")
+$t_end = Time.new(2014,9,12,10,00,0,"+00:00")
+$startmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me '@pubquestbot'", 
         "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
         "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
         "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
@@ -49,7 +49,7 @@ baseurl = "https://api.twitter.com"
 ## Run the following script for each message 
 ## in the $directmessages array above
 message_to_tweet = nil
-$directmessages.each do |message|
+$startmessages.each do |message|
 
     ## Search past pubquestbot tweets for direct messages
     ## Using the same search method as to establish
@@ -74,7 +74,7 @@ $directmessages.each do |message|
     if response.code == '200' then
       pasttweets = JSON.parse(response.body)
 
-puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pasttweets[0]["created_at"]
+# puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + ". Created at: " + pasttweets[0]["created_at"]
 
 
         pasttweets.reverse_each do |pasttweet|
@@ -82,14 +82,12 @@ puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pa
         ## set message_to_tweet if don't find message in pasttweets
         message_to_tweet = case message
         when pasttweet then nil
-        when $directmessages.last.to_s then message if t > $t_end || $users_score.has_value?(30)
+        when $startmessages.last.to_s then message if t > $t_end || $users_score.has_value?(30)
         else message
         # end of message_to_tweet case
         end 
 
-        message_freeze = message.freeze
-
-        # end of bottweets.reverse_each
+         # end of bottweets.reverse_each
         end
    # end of response.code == '200'
     end    
@@ -97,7 +95,7 @@ puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pa
 ## Post direct tweets for pubquest instructions
 ## Use same script for outgoing Tweets
 ## As section 3 of the search & tweet.
-        if $directmessages[message] == 0
+            if $directmessages[message] == 0
             thirdpath    = "/1.1/statuses/update.json"
             thirdaddress = URI("#{baseurl}#{thirdpath}")
             request = Net::HTTP::Post.new thirdaddress.request_uri
@@ -124,8 +122,9 @@ puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pa
               puts "Could not send the Tweet! " +
               "Code:#{response.code} Body:#{response.body}"
             end
+            message_freeze = message.freeze
             $directmessages[message_freeze] == 1
-            sleep 2
+            sleep 1
             # end of if $directmessages[message] == 0
             end
         # end of $directmessages.each do |message|
@@ -182,7 +181,7 @@ bottweets = nil
 if response.code == '200' then
   bottweets = JSON.parse(response.body)
     bottweets.reverse_each do |bottweet|
-    puts bottweet["user"]["name"] + " - " + bottweet["text"]
+    ## puts bottweet["user"]["name"] + " - " + bottweet["text"]
     ## Identify User from bottweet
    to_user = bottweet["in_reply_to_screen_name"]
     to_user_freeze = to_user.freeze
@@ -246,14 +245,18 @@ if response.code == '200' then
         time_arr.insert(3, time_time[0].to_i, time_time[1].to_i, time_time[2].to_i)
         tweet_t = Time.new(time_arr[7].to_i,Date::ABBR_MONTHNAMES.index(time_arr[1]),time_arr[2].to_i,time_arr[3],time_arr[4],time_arr[5])
 
-            time_to_go = case $users_last_time[name]
-                when 0 then ($t_start + 60*20) - tweet_t
-                else ($users_last_time[name] + (60 * 20)) - tweet_t
+            # puts "Last logged time = " + $users_last_time[name].to_s
+            wait_time = case $users_last_time[name]
+                when 0 then ($t_start + 60*20)
+                else ($users_last_time[name] + (60 * 20))
                 # end of time_to_go case
                 end
-
-            t_go = (tweet_t + time_to_go).asctime
-
+            
+            # puts "Wait-time = " +wait_time.to_s
+            #puts wait_time.strftime("Wait-time = %I:%M%p")            
+            time_to_go = wait_time - t
+            t_go = Time.at(time_to_go.to_i.abs).utc.strftime "%H:%M:%S"
+            
             if $users_score[name].to_i == 0
                 $tweetout << "@#{name} Start the quest at #{$barnames[1]} - # 1"
                 $users_score[name_freeze] = 1
@@ -264,12 +267,12 @@ if response.code == '200' then
             ########
             # puts $tweetout[0]
             #########
-puts tweet["user"]["screen_name"] + " - " + tweet["text"]
+        ## puts tweet["user"]["screen_name"] + " - " + tweet["text"]
         ## ^ Removed because list of tweets is flooding heroku logs
         # CHECK TWEET FOR KEY WORDS
         if keywords.all?{|keyword| tweet["text"].to_s.downcase.include? keyword}
         # If Key word found in tweet
-        puts "Key words found in " + tweet["user"]["screen_name"] + " - " + tweet["text"]
+        puts tweet["created_at"] + " Key words found in " + tweet["user"]["screen_name"] + " - " + tweet["text"]
         
         ## Check if Media is included in tweet
         ## If no pics, tweet "Pics or it didn't happen!"
@@ -277,9 +280,9 @@ puts tweet["user"]["screen_name"] + " - " + tweet["text"]
         $tweetout << "@#{name} No dice! Pics or it didn't happen!" if (pic == false)
   
         if tweet_t < ($t_start + 60*20) 
-                    $tweetout << "@#{name} Too early! Tweet to me again at #{t_go}"
+                $tweetout << "@#{name} Too early! Tweet to me again in #{t_go} minutes"
                 elsif ($users_last_time[name] != 0 && tweet_t < ($users_last_time[name] + (60 * 20)))
-                $tweetout << "@#{name} Too early! Tweet to me again at #{t_go}"
+                $tweetout << "@#{name} Too early! Tweet to me again in #{t_go} minutes"
             #end of if tweet_t < ($t_start + 60*20)
             end
         ## SPLIT TWEET UP INTO WORDS 
