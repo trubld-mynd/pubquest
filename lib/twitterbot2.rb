@@ -10,8 +10,7 @@ require './config/environment'
 
 $t_start = Time.new(2014,9,9,12,00,0,"+10:00")
 $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
-$directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot.", 
-        "Tweet your drink count at each pub (max 4) *AND A PHOTO* to me @pubquestbot",
+$startmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me pubquestbot", 
         "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
         "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
         "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
@@ -20,6 +19,7 @@ $directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot
         "Check out the Snakes N Ladders map at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
+$directmessages = Hash[$startmessages.map{|msg| [msg, 0]}]
 
 $names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
@@ -87,6 +87,8 @@ puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pa
         # end of message_to_tweet case
         end 
 
+        message_freeze = message.freeze
+
         # end of bottweets.reverse_each
         end
    # end of response.code == '200'
@@ -95,7 +97,7 @@ puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pa
 ## Post direct tweets for pubquest instructions
 ## Use same script for outgoing Tweets
 ## As section 3 of the search & tweet.
-
+        if $directmessages[message] == 0
             thirdpath    = "/1.1/statuses/update.json"
             thirdaddress = URI("#{baseurl}#{thirdpath}")
             request = Net::HTTP::Post.new thirdaddress.request_uri
@@ -122,7 +124,10 @@ puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pa
               puts "Could not send the Tweet! " +
               "Code:#{response.code} Body:#{response.body}"
             end
+            $directmessages[message_freeze] == 1
             sleep 2
+            # end of if $directmessages[message] == 0
+            end
         # end of $directmessages.each do |message|
         end
     # end of def initialize()
