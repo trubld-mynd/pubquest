@@ -8,10 +8,12 @@ require 'clockwork'
 require './config/boot'
 require './config/environment'
 
+$t_start = Time.new(2014,9,9,12,00,0,"+10:00")
 $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
-$directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me @pubquestbot",
+$directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot.", 
+        "Tweet your drink count at each pub (max 4) *AND A PHOTO* to me @pubquestbot",
         "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
-        "You move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2,3 or 4 spaces on the board!",
+        "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
         "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
         "I'll only accept tweets every 20 minutes. After 20 mins has past, you have a 15 minute window for your next tweet to be read & dice rolled.",
         "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
@@ -19,11 +21,11 @@ $directmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
 
-$names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning"]
+$names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
 $users_score = Hash[$names.map{|user| [user, 0]}]
 $users_last_time = Hash[$names.map{|user| [user, 0]}]
-users_last_location = Hash[$names.map{|user| [user, 0]}]
+$users_last_location = Hash[$names.map{|user| [user, 0]}]
 
 
 $bars = [0,1,4,3,4,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
@@ -71,11 +73,15 @@ $directmessages.each do |message|
     pasttweets = nil
     if response.code == '200' then
       pasttweets = JSON.parse(response.body)
+
+puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + " " + pasttweets[0]["created_at"]
+
+
         pasttweets.reverse_each do |pasttweet|
         
         ## set message_to_tweet if don't find message in pasttweets
         message_to_tweet = case message
-        when pasttweet then break
+        when pasttweet then nil
         when $directmessages.last.to_s then message if t > $t_end || $users_score.has_value?(30)
         else message
         # end of message_to_tweet case
@@ -83,7 +89,7 @@ $directmessages.each do |message|
 
         # end of bottweets.reverse_each
         end
-    # end of response.code == '200'
+   # end of response.code == '200'
     end    
 
 ## Post direct tweets for pubquest instructions
@@ -116,7 +122,7 @@ $directmessages.each do |message|
               puts "Could not send the Tweet! " +
               "Code:#{response.code} Body:#{response.body}"
             end
-            sleep 3
+            sleep 2
         # end of $directmessages.each do |message|
         end
     # end of def initialize()
@@ -133,7 +139,7 @@ t = Time::new
 puts t
 
 ## Establish Users
- 
+
 ## Verify connection to Twitter API
 consumer_key = OAuth::Consumer.new(
 "lZLYSIi4dbgIN9yRzTcIeP8Fk",
@@ -173,7 +179,7 @@ if response.code == '200' then
     bottweets.reverse_each do |bottweet|
     puts bottweet["user"]["name"] + " - " + bottweet["text"]
     ## Identify User from bottweet
-    to_user = bottweet["in_reply_to_screen_name"]
+   to_user = bottweet["in_reply_to_screen_name"]
     to_user_freeze = to_user.freeze
     if to_user != nil && to_user != ""
         ## SPLIT TWEET UP INTO WORDS 
@@ -189,6 +195,7 @@ end
 
 puts "users_score = " + $users_score.to_s
 
+
 ## Run the search & tweet script for all 
 ## users in the user_list
 
@@ -200,7 +207,7 @@ $users_list.each do |name, number|
 secondpath = "/1.1/statuses/user_timeline.json"
 userquery = URI.encode_www_form(
     "screen_name" => name,
-    "count" => 15,
+   "count" => 5,
     )
 secondaddress = URI("#{baseurl}#{secondpath}?#{userquery}")
 request = Net::HTTP::Get.new secondaddress.request_uri
@@ -234,17 +241,25 @@ if response.code == '200' then
         time_arr.insert(3, time_time[0].to_i, time_time[1].to_i, time_time[2].to_i)
         tweet_t = Time.new(time_arr[7].to_i,Date::ABBR_MONTHNAMES.index(time_arr[1]),time_arr[2].to_i,time_arr[3],time_arr[4],time_arr[5])
 
-        if ($users_score[name].to_i == 0 || $users_score[name] == "") || (tweet_t > ($users_last_time[name] + (60 * 20)) && tweet_t < ($users_last_time[name] + (60 * 35)))
-         
-            if tweet_t == nil || (tweet_t < ($t_end - 160) && ($users_score[name].to_i) == 0)
+            time_to_go = case $users_last_time[name]
+                when 0 then ($t_start + 60*20) - tweet_t
+                else ($users_last_time[name] + (60 * 20)) - tweet_t
+                # end of time_to_go case
+                end
+
+            t_go = (tweet_t + time_to_go).asctime
+
+            if $users_score[name].to_i == 0
                 $tweetout << "@#{name} Start the quest at #{$barnames[1]} - # 1"
                 $users_score[name_freeze] = 1
                 $users_last_time[name_freeze] = Time.new
-            end
+            #end of if tweet_t == nil
+        end
+            
             ########
             # puts $tweetout[0]
             #########
-        ## puts tweet["user"]["screen_name"] + " - " + tweet["text"]
+puts tweet["user"]["screen_name"] + " - " + tweet["text"]
         ## ^ Removed because list of tweets is flooding heroku logs
         # CHECK TWEET FOR KEY WORDS
         if keywords.all?{|keyword| tweet["text"].to_s.downcase.include? keyword}
@@ -255,7 +270,13 @@ if response.code == '200' then
         ## If no pics, tweet "Pics or it didn't happen!"
         pic = (tweet["entities"].has_key?("media"))
         $tweetout << "@#{name} No dice! Pics or it didn't happen!" if (pic == false)
-        
+  
+        if tweet_t < ($t_start + 60*20) 
+                    $tweetout << "@#{name} Too early! Tweet to me again at #{t_go}"
+                elsif ($users_last_time[name] != 0 && tweet_t < ($users_last_time[name] + (60 * 20)))
+                $tweetout << "@#{name} Too early! Tweet to me again at #{t_go}"
+            #end of if tweet_t < ($t_start + 60*20)
+            end
         ## SPLIT TWEET UP INTO WORDS 
         words = tweet["text"].to_s.split(" ")
         ## SEARCH FOR INTERGERS & GENERATE
@@ -307,35 +328,39 @@ if response.code == '200' then
             end
 
 ## TWEET BACK THE TWEETOUT
-            thirdpath    = "/1.1/statuses/update.json"
-            thirdaddress = URI("#{baseurl}#{thirdpath}")
-            request = Net::HTTP::Post.new thirdaddress.request_uri
-            request.set_form_data(
-              "status" => "#{$tweetout[0]}",
-            )
-            
-            # Set up HTTP.
-            http             = Net::HTTP.new thirdaddress.host, thirdaddress.port
-            http.use_ssl     = true
-            http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-            
-            # Issue the request.
-            request.oauth! http, consumer_key, access_token
-            http.start
-            response = http.request request
-            
-            # Parse and print the Tweet if the response code was 200
-            tweet = nil
-            if response.code == '200' then
-              tweet = JSON.parse(response.body)
-              puts "Successfully sent #{tweet["text"]}"
-            else
-              puts "Could not send the Tweet! " +
-              "Code:#{response.code} Body:#{response.body}"
-            end
-        
-        puts "tweetout = " + $tweetout[0]
-        puts "Users_score: " + name + " = " + $users_score[name].to_s
+                if $tweetout[0] != nil
+                    thirdpath    = "/1.1/statuses/update.json"
+                    thirdaddress = URI("#{baseurl}#{thirdpath}")
+                    request = Net::HTTP::Post.new thirdaddress.request_uri
+                    request.set_form_data(
+                      "status" => "#{$tweetout[0]}",
+                    )
+                    
+                    # Set up HTTP.
+                    http             = Net::HTTP.new thirdaddress.host, thirdaddress.port
+                    http.use_ssl     = true
+                    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+                    
+                    # Issue the request.
+                    request.oauth! http, consumer_key, access_token
+                    http.start
+                    response = http.request request
+                    
+                    # Parse and print the Tweet if the response code was 200
+                    tweet = nil
+                    if response.code == '200' then
+                      tweet = JSON.parse(response.body)
+                      puts "Successfully sent #{tweet["text"]}"
+                    else
+                      puts "Could not send the Tweet! " +
+                      "Code:#{response.code} Body:#{response.body}"
+                    end
+                
+                # puts "tweetout = " + $tweetout[0].to_s
+                # puts "Users_score: " + name + " = " + $users_score[name].to_s
+
+                # end of if $tweetout[0] != nil
+                end
                 
             # end of if tweet_t < users_last_time[name] && tweet_t < t
             end
@@ -362,5 +387,5 @@ end
 
 include Clockwork
 
-every(2.minutes, 'Queueing instruction-tweets') { Delayed::Job.enqueue TwitterDM.new }
-every(2.minutes, 'Queueing twitter-tweet') { Delayed::Job.enqueue TwitterTweet.new }
+every(1.minutes, 'Queueing instruction-tweets') { Delayed::Job.enqueue TwitterDM.new }
+every(1.minutes, 'Queueing twitter-tweet') { Delayed::Job.enqueue TwitterTweet.new }
