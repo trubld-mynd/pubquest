@@ -12,7 +12,8 @@ $t_start = Time.new(2014,9,9,12,00,0,"+10:00")
 $t_start_local = $t_start.localtime("+10:00") 
 $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
 $t_end_local = $t_end.localtime("+10:00") 
-$startmessages = [,"Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me '@pubquestbot'", 
+$startmessages = ["Hi there...",
+    "Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me '@pubquestbot'", 
        # "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
        # "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
        # "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
