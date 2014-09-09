@@ -363,7 +363,7 @@ puts tweet["user"]["screen_name"] + " - " + tweet["text"]
                 end
                 
             # end of if tweet_t < users_last_time[name] && tweet_t < t
-            end
+            # end
             
             # end of tweets.reverse_each
             end
