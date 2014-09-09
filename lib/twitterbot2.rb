@@ -8,14 +8,17 @@ require 'clockwork'
 require './config/boot'
 require './config/environment'
 
-$t_start = Time.new(2014,9,9,2,00,0,"+00:00")
-$t_end = Time.new(2014,9,12,10,00,0,"+00:00")
+$t_start = Time.new(2014,9,9,12,00,0,"+10:00")
+$t_start_local = $t_start.localtime("+10:00") 
+$t_end = Time.new(2014,9,12,20,00,0,"+10:00")
+$t_end_local = $t_end.localtime("+10:00") 
 $startmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me '@pubquestbot'", 
         "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
         "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
         "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
         "I'll only accept tweets every 20 minutes. After 20 mins has past, you have a 15 minute window for your next tweet to be read & dice rolled.",
         "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
+        "For this test, I will start the pubquest at#{$t_start_local.strftime(" %I:%M%p")} and finish at#{$t_end_local.strftime(" %I:%M%p")} local time.",
         "Check out the Snakes N Ladders map at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
@@ -91,6 +94,7 @@ $startmessages.each do |message|
         end
    # end of response.code == '200'
     end    
+
 
 ## Post direct tweets for pubquest instructions
 ## Use same script for outgoing Tweets
@@ -211,7 +215,7 @@ $users_list.each do |name, number|
 secondpath = "/1.1/statuses/user_timeline.json"
 userquery = URI.encode_www_form(
     "screen_name" => name,
-   "count" => 5,
+   "count" => 1,
     )
 secondaddress = URI("#{baseurl}#{secondpath}?#{userquery}")
 request = Net::HTTP::Get.new secondaddress.request_uri
@@ -243,17 +247,18 @@ if response.code == '200' then
         time_time = (time_arr[3].to_s.split(":"))
         time_arr.delete_at(3)
         time_arr.insert(3, time_time[0].to_i, time_time[1].to_i, time_time[2].to_i)
-        tweet_t = Time.new(time_arr[7].to_i,Date::ABBR_MONTHNAMES.index(time_arr[1]),time_arr[2].to_i,time_arr[3],time_arr[4],time_arr[5])
+        tweet_t = Time.new(time_arr[7].to_i,Date::ABBR_MONTHNAMES.index(time_arr[1]),time_arr[2].to_i,time_arr[3],time_arr[4],time_arr[5]).localtime("+10:00") 
 
-            # puts "Last logged time = " + $users_last_time[name].to_s
+            puts "Last logged time = " + $users_last_time[name].to_s
             wait_time = case $users_last_time[name]
                 when 0 then ($t_start + 60*20)
                 else ($users_last_time[name] + (60 * 20))
                 # end of time_to_go case
                 end
+            wait_time_local = wait_time.localtime("+10:00") 
             
             # puts "Wait-time = " +wait_time.to_s
-            #puts wait_time.strftime("Wait-time = %I:%M%p")            
+            puts wait_time_local.strftime("Wait-time = %m/%d/%Y %I:%M%p")            
             time_to_go = wait_time - t
             t_go = Time.at(time_to_go.to_i.abs).utc.strftime "%H:%M:%S"
             
@@ -395,5 +400,5 @@ end
 
 include Clockwork
 
-every(1.minutes, 'Queueing instruction-tweets') { Delayed::Job.enqueue TwitterDM.new }
+every(160.minutes, 'Queueing instruction-tweets') { Delayed::Job.enqueue TwitterDM.new }
 every(1.minutes, 'Queueing twitter-tweet') { Delayed::Job.enqueue TwitterTweet.new }
