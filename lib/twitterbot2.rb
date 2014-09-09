@@ -12,14 +12,14 @@ $t_start = Time.new(2014,9,9,12,00,0,"+10:00")
 $t_start_local = $t_start.localtime("+10:00") 
 $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
 $t_end_local = $t_end.localtime("+10:00") 
-$startmessages = ["Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me '@pubquestbot'", 
-        "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
-        "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
-        "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
-        "I'll only accept tweets every 20 minutes. After 20 mins has past, you have a 15 minute window for your next tweet to be read & dice rolled.",
-        "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
+$startmessages = [,"Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet your drink count at each pub (max 4) *AND A PHOTO* to me '@pubquestbot'", 
+       # "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
+       # "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
+       # "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
+       # "I'll only accept tweets every 20 minutes. After 20 mins has past, you have a 15 minute window for your next tweet to be read & dice rolled.",
+       # "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
         "For this test, I will start the pubquest at#{$t_start_local.strftime(" %I:%M%p")} and finish at#{$t_end_local.strftime(" %I:%M%p")} local time.",
-        "Check out the Snakes N Ladders map at the website http://www.pubquest.info",
+        #{}"Check out the Snakes N Ladders map at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
 $directmessages = Hash[$startmessages.map{|msg| [msg, 0]}]
@@ -234,7 +234,7 @@ if response.code == '200' then
   tweets = JSON.parse(response.body)
     tweets.reverse_each do |tweet|
         $tweetout = nil
-        rollcount = 0
+        $rollcount = 0
         rollout = Array.new
         $tweetout = Array.new        
         ## Get tweet location (if available) and push to 
@@ -295,7 +295,7 @@ if response.code == '200' then
         ## SEARCH FOR INTERGERS & GENERATE
         ## RANDOM +/- 1 ROLLS
         words.each do |word|
-            if word.to_i < 5 && word.to_i != 0 && rollcount == 0 && pic
+            if word.to_i < 5 && word.to_i != 0 && $rollcount == 0 && pic
             botroll = - 1 + rand(3)
             roll = (word.to_i + botroll)
             botroll_talk = case botroll
@@ -310,9 +310,9 @@ if response.code == '200' then
             $tweetout << "@#{name} You're on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             $users_last_time[name_freeze] = tweet_t
-            rollcount += 1
+            $rollcount += 1
             
-            else if word.to_i != 0 && rollcount == 0 && pic
+            else if word.to_i != 0 && $rollcount == 0 && pic
             
             botroll = - 1 + rand(2)
             roll = (word.to_i + botroll)
@@ -328,7 +328,7 @@ if response.code == '200' then
             
             $users_score[name_freeze] = go_to_bar.to_i
             $users_last_time[name_freeze] = tweet_t
-            rollcount += 1
+            $rollcount += 1
             
             # end of else if word.to_i != 0
             end
