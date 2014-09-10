@@ -28,7 +28,7 @@ $directmessages = Hash[$startmessages.map{|msg| [msg, 0]}]
 
 $names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
-$users_score = Hash[$names.map{|user| [user, 1]}]
+$users_score = Hash[$names.map{|user| [user, 0]}]
 $users_last_time = Hash[$names.map{|user| [user, 0]}]
 $users_last_location = Hash[$names.map{|user| [user, 0]}]
 
@@ -147,7 +147,7 @@ class TwitterTweet
 
 t = Time::new
 t_local = t.localtime("+10:00")
-t_local_string = t_local.strftime(" at %I:%M%p")
+t_local_string = t_local.strftime(" %I:%M%p")
 
 ## Establish Users
 
@@ -168,7 +168,7 @@ baseurl = "https://api.twitter.com"
                     thirdaddress = URI("#{baseurl}#{thirdpath}")
                     request = Net::HTTP::Post.new thirdaddress.request_uri
                     request.set_form_data(
-                      "status" => "I'm awake#{t_local_string} and starting to read tweets",
+                      "status" => "I'm awake at#{t_local_string} and starting to read tweets",
                     )
                     
                     # Set up HTTP.
@@ -269,6 +269,7 @@ if response.code == '200' then
     tweets.reverse_each do |tweet|
         $tweetout = nil
         rollcount = 0
+        botroll = 0
         rollout = Array.new
         $tweetout = Array.new
         # puts "New tweet found - " + tweet["text"]
@@ -297,7 +298,7 @@ if response.code == '200' then
             # time_to_go = wait_time - t
             # t_go = Time.at(time_to_go.to_i.abs).utc.strftime "%H:%M:%S"
             
-            if $users_score[name].to_i <= 1
+            if $users_score[name].to_i == 0
                 $tweetout << "@#{name} Start the quest at #{$barnames[1]} - # 1"
                 #   $users_last_time[name_freeze] = $t_start_local
             #end of if $users_score[name].to_i == 0
@@ -339,15 +340,15 @@ if response.code == '200' then
             botroll = - 1 + rand(3)
             roll = [(word.to_i + botroll), 1].max
             botroll_talk = case botroll
-                when -1 then ", but I take 1! "
-                when 1 then ", but I give +1! "
+                when -1 then " & I take 1! "
+                when 1 then " & I add 1! "
                 else ". "
             end
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-            $tweetout << "@#{name} You're on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} You're on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             rollcount += 1
@@ -359,14 +360,14 @@ if response.code == '200' then
             botroll = - 1 + rand(2)
             roll = [(word.to_i + botroll), 1].max
             botroll_talk = case botroll
-                when -1 then ", but I take 1! "
-                when 1 then ", but I give +1! "
+                when -1 then " & I take 1! "
+                when 1 then " & I add 1! "
                 else ". "
             end
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
-            $tweetout << "@#{name} You're on #{$users_score[name]}, drank max. 4 drinks#{botroll_talk}Your roll is #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} You're on #{$users_score[name]}, drank max. 4 drinks#{botroll_talk}Your roll is #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             
             $users_score[name_freeze] = go_to_bar.to_i
             $users_last_time[name_freeze] = tweet_t
@@ -384,16 +385,16 @@ if response.code == '200' then
                 botroll = - 2 + rand(3)
             roll = [(word.to_i + botroll), 1].max
             botroll_talk = case botroll
-                when -2 then ", but I take 2 (No pic)!"
-                when -1 then ", but I take 1! "
-                when 1 then ", but I give +1! "
+                when -2 then "-2 (No pic)!"
+                when -1 then " & I take 1! "
+                when 1 then " & I add 1! "
                 else ". "
             end
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-            $tweetout << "@#{name} On #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} On #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             rollcount += 1
@@ -404,7 +405,7 @@ if response.code == '200' then
                 go_to_barname = $barnames[go_to_bar]
                 go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-                $tweetout << "@#{name} On #{$users_score[name]} but no pic of last tweet! You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
+                $tweetout << "@#{name}#{t_local_string} On #{$users_score[name]} and last tweet=invalid! You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             rollcount += 1
@@ -432,7 +433,7 @@ if response.code == '200' then
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
-            $tweetout << "@#{name} You're on #{$users_score[name]}, drank a min. 1 drink. Your roll is #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} You're on #{$users_score[name]}, drank a min. 1 drink. You roll #{roll} to ##{($users_score[name] + roll)} - #{go_to_bartalk}#{go_to_barname} - # #{go_to_bar}"
             
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
