@@ -413,7 +413,7 @@ if response.code == '200' then
 
 ## TWEET BACK THE TWEETOUT
 
-                if $tweetout[0] != nil
+
                     thirdpath    = "/1.1/statuses/update.json"
                     thirdaddress = URI("#{baseurl}#{thirdpath}")
                     request = Net::HTTP::Post.new thirdaddress.request_uri
