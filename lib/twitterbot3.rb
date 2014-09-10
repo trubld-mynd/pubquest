@@ -14,26 +14,26 @@ $t_end = Time.new(2014,9,12,20,00,0,"+10:00")
 $t_end_local = $t_end.localtime("+10:00") 
 $startmessages = ["Hi there...",
     "Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet me your drink count at each pub (max 4) AND A PHOTO", 
-       # "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
-       # "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board!",
-       # "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
-       # "I'm only awake every 20 mins. Make sure your tweet to me is the last thing you tweet to anyone before I start, or I'll give you a roll of 1.",
-       # "If you tweet any more than 4 drinks I will deduct one point as penalty before I roll the dice - you'd get 2, 3 or 4 instead of 3, 4 or 5."
-       # "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
-        "For this test, I will start the pubquest at#{$t_start_local.strftime(" %I:%M%p")} and finish at#{$t_end_local.strftime(" %I:%M%p")} local time.",
-        # "Check out the Snakes N Ladders map at the website http://www.pubquest.info",
+       "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
+       "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board.",
+       "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
+       "I'm only awake every 20 mins. Make sure your tweet to me is the last thing you tweet to anyone before I wake, or I'll give you a roll of 1.",
+       "Tweeting more than 4 drinks will land you a 1 point penalty - you'd get 2, 3 or 4 instead of 3, 4 or 5.",
+       "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
+       "I will start the pubquest at#{$t_start_local.strftime(" %I:%M%p")} and finish at#{$t_end_local.strftime(" %I:%M%p")} local time.",
+       "Check out the Snakes N Ladders map, and a copy of these rules, at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
 $directmessages = Hash[$startmessages.map{|msg| [msg, 0]}]
 
 $names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
-$users_score = Hash[$names.map{|user| [user, 0]}]
+$users_score = Hash[$names.map{|user| [user, 1]}]
 $users_last_time = Hash[$names.map{|user| [user, 0]}]
 $users_last_location = Hash[$names.map{|user| [user, 0]}]
 
 
-$bars = [0,1,4,3,4,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
+$bars = [0,1,2,3,2,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
 $barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Ivy (or Felix/Ash St)", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
 $barsnls = ["Start","Go on to ", "LADDER! Go up to ", "Go on to ", "Go on to ", "LADDER! Go up to ", "Go on to ", "Go on to ", "LADDER! Go up to ", "LADDER! Go up to ", "SNAKE! Go back to ", "Le stop at ", "Party at ", "Go on to ", "Pop into ", "SNAKE! Go back to ", "LADDER! Go up to ", "Go down to ", "Go on to ", "Go to ", "Stop in at ", "SNAKE! Go back to ", "Go on to ", "LADDER! Go up to ", "Tune up at ", "Party on to ", "SNAKE! Go back to ", "So close! Go to ", "Move closer to ", "SNAKE! Go back to ", "You made it! Go to "]
 
@@ -160,6 +160,36 @@ access_token = OAuth::Token.new(
 "yiXJmkrdheEi4PNGu4IS7WcX1tC9y9hDR06EFqOtIg2Gg")
 baseurl = "https://api.twitter.com"
 
+## Tweet that pubquest bot is awake
+## and reading tweets
+###################################
+
+                    thirdpath    = "/1.1/statuses/update.json"
+                    thirdaddress = URI("#{baseurl}#{thirdpath}")
+                    request = Net::HTTP::Post.new thirdaddress.request_uri
+                    request.set_form_data(
+                      "status" => "I'm awake#{t_local_string} and starting to read tweets",
+                    )
+                    
+                    # Set up HTTP.
+                    http             = Net::HTTP.new thirdaddress.host, thirdaddress.port
+                    http.use_ssl     = true
+                    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+                    
+                    # Issue the request.
+                    request.oauth! http, consumer_key, access_token
+                    http.start
+                    response = http.request request
+                    
+                    # Parse and print the Tweet if the response code was 200
+                    tweet = nil
+                    if response.code == '200' then
+                      tweet = JSON.parse(response.body)
+                      puts "Successfully sent #{tweet["text"]}"
+                    else
+                      puts "Could not send the wake-up tweet#{t_local_string}! " +
+                      "Code:#{response.code} Body:#{response.body}"
+                    end
 
 ## Establish Keywords
 keywords = ["pubquestbot", "drinks"]
@@ -267,10 +297,9 @@ if response.code == '200' then
             # time_to_go = wait_time - t
             # t_go = Time.at(time_to_go.to_i.abs).utc.strftime "%H:%M:%S"
             
-            if $users_score[name].to_i == 0
+            if $users_score[name].to_i <= 1
                 $tweetout << "@#{name} Start the quest at #{$barnames[1]} - # 1"
-                $users_score[name_freeze] = 1
-             #   $users_last_time[name_freeze] = $t_start_local
+                #   $users_last_time[name_freeze] = $t_start_local
             #end of if $users_score[name].to_i == 0
         end
             

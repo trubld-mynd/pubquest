@@ -1,16 +1,10 @@
-<% require 'twitterbot2.rb' %>
+<% require 'twitterbot3.rb' %>
 <% provide(:title, 'Help') %>
 <h1>Help</h1><br>
 <h2>
   The pubquest is an interactive snakes-and-ladders pub crawl game through the Sydney CBD. </h2><br>
-  <div style="text-align: left">
-  <p><%= $directmessages[0] %></p>
-  <p><%= $directmessages[1] %></p>
-  <p><%= $directmessages[2] %></p>
-  <p><%= $directmessages[3] %></p>
-  <p><%= $directmessages[4] %></p>
-  <p><%= $directmessages[5] %></p>
-  <p><%= $directmessages[6] %></p>
-  <p><%= $directmessages[7] %></p>
+  <div style="margin-left: 50px; margin-right: 75px; text-align: left; font-size: 1.3em">
+    <% for num in (1..10) %> 
+    <p><b><%= num %></b> - <%= $startmessages[num].to_s %></p>
+      <% end %>
 </div>
-</p>
