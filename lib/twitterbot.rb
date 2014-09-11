@@ -557,5 +557,5 @@ end
 
 include Clockwork
 
-every(160.minutes, 'Queueing instruction-tweets') { Delayed::Job.enqueue TwitterDM.new }
+every(180.minutes, 'Queueing instruction-tweets') { Delayed::Job.enqueue TwitterDM.new }
 every(20.minutes, 'Queueing twitter-tweet') { Delayed::Job.enqueue TwitterTweet.new }
