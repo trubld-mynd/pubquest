@@ -99,7 +99,7 @@ $startmessages.each do |message|
             thirdaddress = URI("#{baseurl}#{thirdpath}")
             request = Net::HTTP::Post.new thirdaddress.request_uri
             request.set_form_data(
-              "status" => message_to_tweet,
+              "status" => "#{message_to_tweet}"
             )
             
             # Set up HTTP.
