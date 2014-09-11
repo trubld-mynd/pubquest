@@ -24,7 +24,6 @@ $startmessages = ["Hi there...",
        "Check out the Snakes N Ladders map, and a copy of these rules, at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
-$directmessages = Hash[$startmessages.map{|msg| [msg, 0]}]
 
 $names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
@@ -53,18 +52,18 @@ baseurl = "https://api.twitter.com"
 
 ## Run the following script for each message 
 ## in the $directmessages array above
-$message_to_tweet = nil
+message_to_tweet = nil
 $startmessages.each do |message|
 
     ## Search past pubquestbot tweets for direct messages
     ## Using the same search method as to establish
     ## users past pub instructions
     firstpath = "/1.1/statuses/user_timeline.json"
-    firstquery = URI.encode_www_form(
+    locationquery = URI.encode_www_form(
         "screen_name" => "pubquestbot",
         "count" => 200,
         )
-    firstaddress = URI("#{baseurl}#{firstpath}?#{firstquery}")
+    firstaddress = URI("#{baseurl}#{firstpath}?#{locationquery}")
     request = Net::HTTP::Get.new firstaddress.request_uri
 
     http             = Net::HTTP.new firstaddress.host, firstaddress.port
@@ -78,35 +77,29 @@ $startmessages.each do |message|
     pasttweets = nil
     if response.code == '200' then
       pasttweets = JSON.parse(response.body)
-
-# puts "Code:#{response.code} Pasttweet: " + pasttweets[0]["text"].to_s + ". Created at: " + pasttweets[0]["created_at"]
-
-
         pasttweets.reverse_each do |pasttweet|
-        
-        ## set $message_to_tweet if don't find message in pasttweets
-        $message_to_tweet = case message
-        when pasttweet then nil
-        when $startmessages.last.to_s then message if t > $t_end || $users_score.has_value?(30)
+        ## set message_to_tweet if don't find message in pasttweets
+        message_to_tweet = case message
+        when pasttweet then break
+        when $startmessages.last then message if t > $t_end
         else message
-        # end of $message_to_tweet case
+        # end of message_to_tweet case
         end 
 
-         # end of bottweets.reverse_each
+        # end of bottweets.reverse_each
         end
-   # end of response.code == '200'
+    # end of response.code == '200'
     end    
-
 
 ## Post direct tweets for pubquest instructions
 ## Use same script for outgoing Tweets
 ## As section 3 of the search & tweet.
-            #if $directmessages[message] == 0
+
             thirdpath    = "/1.1/statuses/update.json"
             thirdaddress = URI("#{baseurl}#{thirdpath}")
             request = Net::HTTP::Post.new thirdaddress.request_uri
             request.set_form_data(
-              "status" => $message_to_tweet
+              "status" => message_to_tweet,
             )
             
             # Set up HTTP.
@@ -123,17 +116,13 @@ $startmessages.each do |message|
             tweet = nil
             if response.code == '200' then
               tweet = JSON.parse(response.body)
-              puts "Successfully sent #{tweet["text"]}"
+              puts "Successfully sent start tweet #{tweet["text"]}"
             else
-              puts "Could not send the Tweet #{$message_to_tweet}! " +
+              puts "Could not send the start tweet #{message_to_tweet}! " +
               "Code:#{response.code} Body:#{response.body}"
             end
-            message_freeze = message.freeze
-            $directmessages[message_freeze] == 1
-            sleep 1
-            # end of if $directmessages[message] == 0
-            # end
-        # end of $directmessages.each do |message|
+            sleep 5
+        # end of directmessages.each do |message|
         end
     # end of def initialize()
     end
