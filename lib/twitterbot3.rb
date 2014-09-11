@@ -264,11 +264,12 @@ response = http.request request
 
 tweets = nil
 tweet_t = nil
+$rollcount = 0
 if response.code == '200' then
   tweets = JSON.parse(response.body)
-    tweets.reverse_each do |tweet|
+    tweets.each do |tweet|
+        if $rollcount == 0
         $tweetout = nil
-        rollcount = 0
         botroll = 0
         rollout = Array.new
         $tweetout = Array.new
@@ -300,6 +301,7 @@ if response.code == '200' then
             
             if $users_score[name].to_i == 0
                 $tweetout << "@#{name} Start the quest at #{$barnames[1]} - # 1"
+                $rollcount += 1
                 #   $users_last_time[name_freeze] = $t_start_local
             #end of if $users_score[name].to_i == 0
         end
@@ -319,7 +321,7 @@ if response.code == '200' then
         pic = (tweet["entities"].has_key?("media"))
         
         ####
-        puts "Pic = " + pic.to_s
+        # puts "Pic = " + pic.to_s
         ###
         
         # if tweet_t < ($t_start + 60*20) 
@@ -334,9 +336,9 @@ if response.code == '200' then
         ## SEARCH FOR INTERGERS & GENERATE
         ## RANDOM +/- 1 ROLLS
         words.each do |word|
-          puts "Word test: " + word.to_s if  (word.to_i < 5 && word.to_i != 0 && rollcount == 0)
+          puts "Word test: " + word.to_s if  (word.to_i < 5 && word.to_i != 0 && $rollcount == 0)
             
-            if word.to_i < 5 && word.to_i != 0 && rollcount == 0 && pic
+            if word.to_i < 5 && word.to_i != 0 && $rollcount == 0 && pic
             botroll = - 1 + rand(3)
             roll = [(word.to_i + botroll), 1].max
             botroll_talk = case botroll
@@ -351,11 +353,11 @@ if response.code == '200' then
             $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
-            rollcount += 1
+            $rollcount += 1
             
             end
             
-            if word.to_i != 0 && rollcount == 0 && pic
+            if word.to_i != 0 && $rollcount == 0 && pic
             
             botroll = - 2 + rand(3)
             roll = [(4 + botroll), 1].max
@@ -372,7 +374,7 @@ if response.code == '200' then
             
             $users_score[name_freeze] = go_to_bar.to_i
             $users_last_time[name_freeze] = tweet_t
-            rollcount += 1
+            $rollcount += 1
             
             end
 
@@ -381,8 +383,8 @@ if response.code == '200' then
             #end of word.to_i < 5
             #end
 
-        if pic == false
-            if word.to_i < 5 && word.to_i != 0 && rollcount == 0
+        if pic == false && $rollcount == 0
+            if word.to_i < 5 && word.to_i != 0
                 botroll = - 2 + rand(3)
             roll = [(word.to_i + botroll), 1].max
             botroll_talk = case botroll
@@ -398,7 +400,7 @@ if response.code == '200' then
             $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
-            rollcount += 1
+            $rollcount += 1
         
             else
                 roll = 1
@@ -409,7 +411,7 @@ if response.code == '200' then
                 $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]} but neither pic nor valid drink count! Move #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
-            rollcount += 1
+            $rollcount += 1
 
         end
         # end if pic == false
@@ -474,6 +476,7 @@ if response.code == '200' then
                 
                 # puts "tweetout = " + $tweetout[0].to_s
                 puts "Users_score: " + name + " = " + $users_score[name].to_s
+                puts "**********************"
                 
             
         ## sleep for 3 seconds, so don't get 429 code
@@ -481,6 +484,9 @@ if response.code == '200' then
            sleep 2
            ############################
             
+        # end of if $rollcount == 0
+        end
+
         # end of if response.code == '200'
         end
 
