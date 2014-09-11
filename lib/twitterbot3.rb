@@ -443,7 +443,8 @@ if response.code == '200' then
             # end of if $tweetout[0] != nil
         end
 
-
+        # end of if $rollcount == 0
+        end
 ## TWEET BACK THE TWEETOUT
 
 
@@ -484,8 +485,6 @@ if response.code == '200' then
            sleep 2
            ############################
             
-        # end of if $rollcount == 0
-        end
 
         # end of if response.code == '200'
         end
