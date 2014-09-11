@@ -101,7 +101,7 @@ $startmessages.each do |message|
 ## Post direct tweets for pubquest instructions
 ## Use same script for outgoing Tweets
 ## As section 3 of the search & tweet.
-            if $directmessages[message] == 0
+            #if $directmessages[message] == 0
             thirdpath    = "/1.1/statuses/update.json"
             thirdaddress = URI("#{baseurl}#{thirdpath}")
             request = Net::HTTP::Post.new thirdaddress.request_uri
@@ -125,14 +125,14 @@ $startmessages.each do |message|
               tweet = JSON.parse(response.body)
               puts "Successfully sent #{tweet["text"]}"
             else
-              puts "Could not send the Tweet #{message_to_tweet}! " +
+              puts "Could not send the Tweet #{$message_to_tweet}! " +
               "Code:#{response.code} Body:#{response.body}"
             end
             message_freeze = message.freeze
             $directmessages[message_freeze] == 1
             sleep 1
             # end of if $directmessages[message] == 0
-            end
+            # end
         # end of $directmessages.each do |message|
         end
     # end of def initialize()
@@ -150,7 +150,7 @@ t_20 = t + (20 * 60)
 t_local = t.localtime("+10:00")
 t_local_string = t_local.strftime(" %I:%M%p")
 t_20_local = t_20.localtime("+10:00")
-t_20_local_string = t_local_20.strftime(" %I:%M%p")
+t_20_local_string = t_20_local.strftime(" %I:%M%p")
 
 ## Establish Users
 
@@ -528,6 +528,36 @@ if response.code == '200' then
 
         #end of users.list.each
         end
+
+## TWEET SIGNOFF TWEET
+
+
+                    thirdpath    = "/1.1/statuses/update.json"
+                    thirdaddress = URI("#{baseurl}#{thirdpath}")
+                    request = Net::HTTP::Post.new thirdaddress.request_uri
+                    request.set_form_data(
+                      "status" => "Have fun! I'm going back to sleep until #{t_20_local_string}...",
+                    )
+                    
+                    # Set up HTTP.
+                    http             = Net::HTTP.new thirdaddress.host, thirdaddress.port
+                    http.use_ssl     = true
+                    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+                    
+                    # Issue the request.
+                    request.oauth! http, consumer_key, access_token
+                    http.start
+                    response = http.request request
+                    
+                    # Parse and print the Tweet if the response code was 200
+                    tweet = nil
+                    if response.code == '200' then
+                      tweet = JSON.parse(response.body)
+                      puts "Successfully sent #{tweet["text"]}"
+                    else
+                      puts "Could not send the Tweet #{$tweetout[0]}! " +
+                      "Code:#{response.code} Body:#{response.body}"
+                    end
 
     # end of def initialize()
     end
