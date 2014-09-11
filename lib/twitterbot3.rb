@@ -478,6 +478,7 @@ if response.code == '200' then
                 # puts "tweetout = " + $tweetout[0].to_s
                 puts "Users_score: " + name + " = " + $users_score[name].to_s
                 puts "**********************"
+                puts " "
                 
             
         ## sleep for 3 seconds, so don't get 429 code
