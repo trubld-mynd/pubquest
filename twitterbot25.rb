@@ -25,7 +25,7 @@ $startmessages = ["Hi there...",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
 
-$names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
+$names = ["violetgangstaz", "thegreenfurries", "thegoldenfists", "theredpredators", "thechillshowers", "thebrownsharks"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
 $users_score = Hash[$names.map{|user| [user, 0]}]
 $users_last_time = Hash[$names.map{|user| [user, 0]}]
@@ -33,7 +33,7 @@ $users_last_location = Hash[$names.map{|user| [user, 0]}]
 
 
 $bars = [0,1,2,3,2,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
-$barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Ivy/Felix/Ash St)", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
+$barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Ivy/Felix/Ash St", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
 $barsnls = ["Start","Go on to ", "Go down to ", "Go on to ", "SNAKE! Go back to ", "LADDER! Go up to ", "Go on to ", "Go on to ", "LADDER! Go up to ", "LADDER! Go up to ", "SNAKE! Go back to ", "Le stop at ", "Party at ", "Go on to ", "Pop into ", "SNAKE! Go back to ", "LADDER! Go up to ", "Go down to ", "Go on to ", "Go to ", "Stop in at ", "SNAKE! Go back to ", "Go on to ", "LADDER! Go up to ", "Tune up at ", "Party on to ", "SNAKE! Go back to ", "So close! Go to ", "Move closer to ", "SNAKE! Go back to ", "You made it! "]
 
 
@@ -375,7 +375,7 @@ if response.code == '200' then
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, drank #{word.to_i}#{botroll_talk}Roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             $rollcount += 1
@@ -395,7 +395,7 @@ if response.code == '200' then
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, tried #{word.to_i} drinks (cheeky). Max is 4#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, tried #{word.to_i} drinks (cheeky). Max is 4#{botroll_talk}Roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             
             $users_score[name_freeze] = go_to_bar.to_i
             $users_last_time[name_freeze] = tweet_t
@@ -422,7 +422,7 @@ if response.code == '200' then
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]} and drank #{word.to_i}#{botroll_talk}You roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, drank #{word.to_i}#{botroll_talk}Roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             $rollcount += 1
@@ -461,7 +461,7 @@ if response.code == '200' then
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, drank a min. 1 drink. You roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, drank a min of 1! Roll #{roll} to ##{($users_score[name] + roll)}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
