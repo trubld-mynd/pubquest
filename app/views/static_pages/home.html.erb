@@ -24,7 +24,11 @@
 	<%	require 'twitterbot25.rb' 
   $users_score.each do |name, score| %>
   	<%= name %> - <%= score %><br>
-  	<% end %><br>
+  	<% end %><br><br>
+  <%  require 'oldtwitterbot.rb' 
+  $oldusers_score.each do |name, score| %>
+    <%= name %> - <%= score %><br>
+    <% end %><br>
 	</div>
 
 <script type="text/javascript">
