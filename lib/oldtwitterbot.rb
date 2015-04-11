@@ -26,9 +26,9 @@ $startmessages = ["Hi there...",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
 $directmessages = Hash[$startmessages.map{|msg| [msg, 0]}]
 
-$names = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
-$oldusers_list = Hash[$names.map{|user| [user, 0]}]
-$oldusers_score = Hash[$names.map{|user| [user, 0]}]
+$oldnames = ["PoisonSlammers", "TheWindSlayers", "PurpleSquirels", "TheGhostSharks", "MightyCommandos", "DreamLightning", "StokedTurtles"]
+$oldusers_list = Hash[$oldnames.map{|user| [user, 0]}]
+$oldusers_score = Hash[$oldnames.map{|user| [user, 0]}]
 
 class OldTwitterRead
     def initialize()
