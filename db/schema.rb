@@ -11,13 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150411025007) do
+ActiveRecord::Schema.define(version: 20150412131528) do
 
-  create_table "scores", force: true do |t|
+  create_table "users", force: true do |t|
+    t.string   "name"
+    t.string   "name_profile_image_url"
+    t.integer  "score"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "name"
-    t.integer  "score"
   end
 
 end

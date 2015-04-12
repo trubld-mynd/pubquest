@@ -25,7 +25,10 @@
   $users_score.each do |name, score| %>
   	<%= name %> - <%= score %><br>
   	<% end %><br><br>
-  
+  <h1>Old Team List</h1><br>
+  <% @users.each do |user| %>
+  <img src= <%= user.name_profile_image_url %> > <%= user.name %> - <%= user.score %><br>
+  <% end %><br><br>
 	</div>
 
 <script type="text/javascript">
