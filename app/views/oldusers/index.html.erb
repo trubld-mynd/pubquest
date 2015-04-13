@@ -1,0 +1,264 @@
+
+
+<script src="//maps.google.com/maps/api/js?v=3.13&amp;sensor=false&amp;libraries=geometry" type="text/javascript"></script>
+<script src='//google-maps-utility-library-v3.googlecode.com/svn/tags/markerclustererplus/2.0.14/src/markerclusterer_packed.js' type='text/javascript'></script>
+<script type='text/javascript' src='script.js'></script>
+<div class="center hero-unit">
+  <h1>Welcome to the "<span style="color: #008B53">Snakes</span> n <span style="color: #FF0000">Ladders</span>" Pubquest</h1>
+
+  <h2>
+     Submit your drink score to <a href="https://twitter.com/pubquestbot">@pubquestbot</a> on Twitter in the format<br>
+ </h2>
+ <h2><b>"@pubquestbot <i>n</i> drinks"</b></h2>
+	<span style="font-size: 0.9em"><br>where <i>n</i> is the number of drinks your team had in that pub (maximum 4 drinks per pub)</span>
+  <p>The challenge ends at<%= 
+	require 'twitterbot25.rb'
+  $t_end_local.strftime(" %I:%M%p") %></p>
+  <div style='width: 95%; margin-left: auto; margin-right: auto;'>
+  	<div id='sidebar_builder' style='width: 95%; height: 800px;'></div>
+  </div><br>
+  <div id='sidebar_container' style="text-align: left; clear: both; float: left"><h1>Bar List</h1>
+</div>
+<div style="position: relative; float: right">
+	<h1>Team List</h1><br>
+	<%	require 'twitterbot25.rb' 
+  $users_score.each do |name, score| %>
+  	<%= name %> - <%= score %><br>
+  	<% end %><br><br>
+  <h1>Old Team List</h1><br>
+  <% @oldusers.each do |user| %>
+  <img src='"'+<%= olduser.name_profile_image_url %>+'"'> - <%= olduser.name %> - <%= olduser.score %><br>
+  <% end %><br><br>
+	</div>
+
+<script type="text/javascript">
+function createSidebarLi(json){
+  return ("<li><a>" + json.name + "</a></li>");
+};
+
+function bindLiToMarker($li, marker){
+  $li.on('click', function(){
+    handler.getMap().setZoom(15); 
+    //check this - 15 may be too far away - increase this to zoom in 
+    // (check https://github.com/apneadiving/Google-Maps-for-Rails/wiki/Change-handler-behavior for exactly what the numbers mean)
+    marker.setMap(handler.getMap()); //because clusterer removes map property from marker
+    marker.panTo();
+    google.maps.event.trigger(marker.getServiceObject(), 'click');
+  })
+};
+
+function createSidebar(json_array){
+  _.each(json_array, function(json){
+    var $li = $( createSidebarLi(json) );
+    $li.appendTo('#sidebar_container');
+    bindLiToMarker($li, json.marker);
+  });
+};
+
+var handler = Gmaps.build('Google');
+handler.buildMap({ internal: {id: 'sidebar_builder'} }, function(){
+  var json_array = [
+	{ lat: -33.872759, lng: 151.205674, name: "START", picture: {url: "/ni/0.png", width: 36, height: 36 }, infowindow: "Start" },
+	{ lat: -33.872639, lng: 151.205863, name: "1 - Sweeny’s Hotel", picture: {url: "/ni/1.png", width: 36, height: 36 }, infowindow: "Sweenys" },
+	{ lat: -33.872119, lng: 151.20552, name: "2 - Grandma’s Bar", picture: {url: "/ni/2.png", width: 36, height: 36 }, infowindow: "Grandmas" },
+	{ lat: -33.871676, lng: 151.206298, name: "3 - The Cuban Place", picture: {url: "/ni/3.png", width: 36, height: 36 }, infowindow: "Cuban" },
+	{ lat: -33.870313, lng: 151.206014  , name: "4 - 99 on York", picture: {url: "/ni/4.png", width: 36, height: 36 }, infowindow: "99onYork" },
+	{ lat: -33.86979, lng: 151.206278, name: "5 - The Rook", picture: {url: "/ni/5.png", width: 36, height: 36 }, infowindow: "Rook" },
+	{ lat: -33.869616, lng: 151.205931, name: "6 - The Barber Shop", picture: {url: "/ni/6.png", width: 36, height: 36 }, infowindow: "Barbers" },
+	{ lat: -33.868987, lng: 151.206187, name: "7 - The SG", picture: {url: "/ni/7.png", width: 36, height: 36 }, infowindow: "SG" },
+	{ lat: -33.868787, lng: 151.206167  , name: "8 - Forbes Hotel", picture: {url: "/ni/8.png", width: 36, height: 36 }, infowindow: "Forbes" },
+	{ lat: -33.868842, lng: 151.205456, name: "9 - P J O’Brien’s", picture: {url: "/ni/9.png", width: 36, height: 36 }, infowindow: "PJs" },
+	{ lat: -33.868601, lng: 151.205907, name: "10 - Hotel CBD", picture: {url: "/ni/10.png", width: 36, height: 36 }, infowindow: "CBD" },
+	{ lat: -33.868606, lng: 151.206133, name: "11 - Le Pub", picture: {url: "/ni/11.png", width: 36, height: 36 }, infowindow: "LePub" },
+	{ lat: -33.86842, lng: 151.205916, name: "12 - Mojo Record Bar", picture: {url: "/ni/12.png", width: 36, height: 36 }, infowindow: "Mojo" },
+	{ lat: -33.868277, lng: 151.206097, name: "13 - Bavarian Bier Café", picture: {url: "/ni/13.png", width: 36, height: 36 }, infowindow: "Bavarian" },
+	{ lat: -33.867439, lng: 151.205797, name: "14 - Stitch Bar", picture: {url: "/ni/14.png", width: 36, height: 36 }, infowindow: "Stitch" },
+	{ lat: -33.86725, lng: 151.205766, name: "15 - Uncle Ming’s", picture: {url: "/ni/15.png", width: 36, height: 36 }, infowindow: "Mings" },
+	{ lat: -33.866984, lng: 151.206385, name: "16 - Steel Bar n Grill", picture: {url: "/ni/16.png", width: 36, height: 36 }, infowindow: "Steel" },
+	{ lat: -33.867723, lng: 151.207744, name: "17 - GPO", picture: {url: "/ni/17.png", width: 36, height: 36 }, infowindow: "GPO" },
+	{ lat: -33.866939, lng: 151.20846, name: "18 - Angel Hotel", picture: {url: "/ni/18.png", width: 36, height: 36 }, infowindow: "Angel" },
+	{ lat: -33.866531, lng: 151.207508, name: "19 - Ivy (or Felix, or Ash St Cellar", picture: {url: "/ni/19.png", width: 36, height: 36 }, infowindow: "Ivy" },
+	{ lat: -33.866343, lng: 151.207283, name: "20 - Royal George", picture: {url: "/ni/20.png", width: 36, height: 36 }, infowindow: "RG" },
+	{ lat: -33.864017, lng: 151.207557, name: "21 - The Establishment", picture: {url: "/ni/21.png", width: 36, height: 36 }, infowindow: "Establish’t" },
+	{ lat: -33.863776, lng: 151.207584, name: "22 - Metropolitan Hotel", picture: {url: "/ni/22.png", width: 36, height: 36 }, infowindow: "Metro" },
+	{ lat: -33.864079, lng: 151.208036, name: "23 - Mr Wong’s", picture: {url: "/ni/23.png", width: 36, height: 36 }, infowindow: "Wong’s" },
+	{ lat: -33.863742, lng: 151.208518, name: "24 - Bridge St Garage", picture: {url: "/ni/24.png", width: 36, height: 36 }, infowindow: "Garage" },
+	{ lat: -33.86369, lng: 151.208876, name: "25 - The Republic Hotel", picture: {url: "/ni/25.png", width: 36, height: 36 }, infowindow: "Republic" },
+	{ lat: -33.864168, lng: 151.208576, name: "26 - Tank Steam Bar", picture: {url: "/ni/26.png", width: 36, height: 36 }, infowindow: "Tank" },
+	{ lat: -33.864165, lng: 151.208396, name: "27 - Palmer and Co.", picture: {url: "/ni/27.png", width: 36, height: 36 }, infowindow: "Palmer" },
+	{ lat: -33.864958, lng: 151.208147, name: "28 - Ryan’s Bar", picture: {url: "/ni/28.png", width: 36, height: 36 }, infowindow: "Ryans" },
+	{ lat: -33.865546, lng: 151.208485, name: "29 - The Grand Hotel", picture: {url: "/ni/29.png", width: 36, height: 36 }, infowindow: "GrandHotel" },
+	{ lat: -33.865918, lng: 151.209348, name: "30 - Frankie’s Pizza", picture: {url: "/ni/30.png", width: 36, height: 36 }, infowindow: "Frankies" }
+
+];
+// --------------------------------
+// DON'T FOREGET TO UPLOAD ALL OF THE IMAGE FILES TO "images/___.png"
+// --------------------------------
+
+// --------------------------------
+// Change Lat & Lng for the pubquest route...
+// -------------------------------- 
+
+  var markers = handler.addMarkers(json_array);
+
+  _.each(json_array, function(json, index){
+    json.marker = markers[index];
+  
+  if(navigator.geolocation)
+    navigator.geolocation.getCurrentPosition(displayOnMap);
+});
+
+// Draw polygons from "Multiple Overlays" code
+var polylines = handler.addPolylines(
+    [
+      [
+        {lat: -33.872599, lng: 151.205717},
+        {lat: -33.872102, lng: 151.205674},
+        {lat: -33.872044, lng: 151.206420},
+        {lat: -33.870841, lng: 151.206296},
+        {lat: -33.868646, lng: 151.206023},
+		{lat: -33.867026, lng: 151.205816},
+		{lat: -33.867104, lng: 151.207128},
+		{lat: -33.867470, lng: 151.207082},
+		{lat: -33.867601, lng: 151.208482},
+		{lat: -33.867020, lng: 151.208509},
+		{lat: -33.867006, lng: 151.208187},
+		{lat: -33.867209, lng: 151.208126},
+		{lat: -33.867171, lng: 151.207635},
+		{lat: -33.866458, lng: 151.207705},
+		{lat: -33.866414, lng: 151.207208},
+		{lat: -33.863695, lng: 151.207466},
+		{lat: -33.863692, lng: 151.207823},
+		{lat: -33.864049, lng: 151.207857},
+		{lat: -33.864075, lng: 151.208646},
+		{lat: -33.863646, lng: 151.208708},
+		{lat: -33.863626, lng: 151.208944},
+		{lat: -33.864211, lng: 151.208879},
+		{lat: -33.864222, lng: 151.208193},
+		{lat: -33.864935, lng: 151.208115},
+		{lat: -33.865127, lng: 151.208759},
+		{lat: -33.865668, lng: 151.208673},
+		{lat: -33.865957, lng: 151.209314}
+
+      ]
+    ],
+    { strokeColor: '#000000'}
+  );
+
+var snakelines = handler.addPolylines(
+    [
+    	[ // 4 to 2
+        {lat: -33.872119, lng: 151.20552},
+        {lat: -33.870313, lng: 151.206014}
+      ],
+      // 10 to 7
+      [
+        {lat: -33.868601, lng: 151.205907},
+        {lat: -33.868987, lng: 151.206187}
+      ],
+      // 15 to 12
+      [
+      	{lat: -33.86725, lng: 151.205766},
+      	{lat: -33.867425, lng: 151.205664},
+      	{lat: -33.867730, lng: 151.205972},
+      	{lat: -33.868024, lng: 151.205894},
+      	{lat: -33.86842, lng: 151.205916},
+      ],
+      // 21 to 17
+      [
+      	{lat: -33.864017, lng: 151.207557},
+		{lat: -33.864416, lng: 151.207487},
+		{lat: -33.865133, lng: 151.207632},
+		{lat: -33.865646, lng: 151.207471},
+		{lat: -33.866038, lng: 151.207445},
+		{lat: -33.866906, lng: 151.207788},
+		{lat: -33.867427, lng: 151.207504},
+      	{lat: -33.867723, lng: 151.207744},
+      ],
+      // 22 to 18 < taken out because too long
+      //[
+      	//{lat: -33.863776, lng: 151.207584},
+      	//{lat: -33.864242, lng: 151.207911},
+		//{lat: -33.864808, lng: 151.207922},
+		//{lat: -33.865463, lng: 151.208238},
+		//{lat: -33.866162, lng: 151.208592},
+		//{lat: -33.866559, lng: 151.208319},
+      	//{lat: -33.866939, lng: 151.20846},
+      //],
+      // 26 to 24
+      [
+      	{lat: -33.864168, lng: 151.208576},
+      	{lat: -33.863742, lng: 151.208518},
+      ],
+      // 29 to 28
+      [
+      	{lat: -33.865546, lng: 151.208485},
+      	{lat: -33.864958, lng: 151.208147},
+      ]
+    ],
+    { strokeColor: '#FF0000'}
+  );
+  
+var ladderlines = handler.addPolylines(
+    [
+      // 5 to 6
+      [
+      	{lat: -33.86979, lng: 151.206278},
+      	{lat: -33.869616, lng: 151.205931},
+      ],
+      // 8 to 11
+      [
+      	{lat: -33.868787, lng: 151.206167},
+		{lat: -33.868606, lng: 151.206133},
+      ],
+      // 9 to 13      
+      [ 
+      	{lat: -33.868842, lng: 151.205456},
+		{lat: -33.868277, lng: 151.206097},
+      ],
+      // 16 to 20
+      [
+      	{lat: -33.866984, lng: 151.206385},
+      	{lat: -33.866343, lng: 151.207283},
+      ],
+      // 23 to 27
+      [
+      	{lat: -33.864079, lng: 151.208036},
+      	{lat: -33.864165, lng: 151.208396},
+      ]
+    ],
+    { strokeColor: '#008B53', strokeWeight: 10}
+  );
+  
+// --------------------------------
+// Change Lat & Lng for the pubquest route...
+// --------------------------------  
+
+// Sidebar creator from original sidebar code
+createSidebar(json_array);
+  handler.bounds.extendWith(markers);
+  handler.bounds.extendWith(polylines);
+  handler.bounds.extendWith(snakelines);
+  handler.bounds.extendWith(ladderlines);
+  handler.fitMapToBounds();
+});
+
+// --------------------------------
+// This may need to go inside handler.buildMap
+// --------------------------------
+
+function displayOnMap(position){ 
+  var marker = handler.addMarker({
+    lat: position.coords.latitude,
+    lng: position.coords.longitude
+  });
+  handler.map.centerOn(marker);
+}; //End of function displayOnMap(position)
+
+
+</script>
+
+
+</div>
+
+<%= link_to image_tag("badger.png", alt: "Badger Badger Badger"), 'https://www.youtube.com/watch?v=EIyixC9NsLI' %>
