@@ -359,13 +359,18 @@ if response.code == '200' then
             # time_to_go = wait_time - t
             # t_go = Time.at(time_to_go.to_i.abs).utc.strftime "%H:%M:%S"
             
-            if $users_score[name].to_i == 1
-                $tweetout << "@#{name}#{t_local_string} Start the quest at #{$barnames[1]} - # 1"
-                $rollcount += 1
-                #   $users_last_time[name_freeze] = $t_start_local
-            #end of if $users_score[name].to_i == 0
-        end
+
+
+            ### REMOVED START-THE-QUEST TWEET TO REMOVE THE LOOP
+            # if $users_score[name].to_i == 0
+            #    $tweetout << "@#{name}#{t_local_string} Start the quest at #{$barnames[1]} - # 1"
+            #    $rollcount += 1
+            #    #end of if $users_score[name].to_i == 0
+            # end
+            ### IF REINSTATED THEN NEED TO MAKE SURE opening $users_score is ZERO
             
+
+
             ########
             # puts $tweetout[0]
             #########
