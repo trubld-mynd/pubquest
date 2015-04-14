@@ -25,8 +25,7 @@ $startmessages = ["Hi there...",
         "LET THE GAMES BEGIN!",
         "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate / party with the winners!"]
 
-$names = ["violetgangstaz", "thegreenfurries", "thegoldenfists", "theredpredators", "thechillshowers", "thebrownsharks", "thesadtigers", "theorangechaser
-"]
+$names = ["violetgangstaz", "thegreenfurries", "thegoldenfists", "theredpredators", "thechillshowers", "thebrownsharks", "thesadtigers", "theorangechaser"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
 $users_score = Hash[$names.map{|user| [user, 1]}]
 $users_last_time = Hash[$names.map{|user| [user, 0]}]
