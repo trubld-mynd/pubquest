@@ -23,23 +23,24 @@ $startmessages = ["Hi there...",
        "I will start the pubquest at#{$t_start_local.strftime(" %I:%M%p")} and finish at#{$t_end_local.strftime(" %I:%M%p")} local time.",
        "Check out the Snakes N Ladders map, and a copy of these rules, at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
-        "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate & party with the winners!"]
+        "The pubquest is over! Come to Frankie's Pizza (Pub 30) to celebrate / party with the winners!"]
 
-$names = ["violetgangstaz", "thegreenfurries", "thegoldenfists", "theredpredators", "thechillshowers", "thebrownsharks"]
+$names = ["violetgangstaz", "thegreenfurries", "thegoldenfists", "theredpredators", "thechillshowers", "thebrownsharks", "thesadtigers", "theorangechaser"]
 $users_list = Hash[$names.map{|user| [user, 0]}]
-$users_score = Hash[$names.map{|user| [user, 0]}]
+$users_score = Hash[$names.map{|user| [user, 1]}]
 $users_last_time = Hash[$names.map{|user| [user, 0]}]
 $users_last_location = Hash[$names.map{|user| [user, 0]}]
 
 
 $bars = [0,1,2,3,2,6,6,7,11,13,7,11,12,13,14,12,20,17,18,19,20,17,22,27,24,25,24,27,28,28,30]
-$barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Ivy/Felix/Ash St", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
+$barnames = ["Start", "Sweeny's", "Grandma's", "Cuban", "99onYork", "The Rook", "Barbershop", "SG's", "Forbes", "PJs", "CBD", "Le Pub", "Mojo", "Bavarian", "Stitch", "Uncle Ming's", "Steel Br & Grill", "GPO Bar", "Angel Hotel", "Felix/Ash St", "Royal George", "Establish", "Metropolitan", "Mr Wong's", "BridgeSt", "Republic", "Tank", "Palmer & Co", "Ryans", "Grand Hotel", "Frankies"]
 $barsnls = ["Start","Go on to ", "Go down to ", "Go on to ", "SNAKE! Go back to ", "LADDER! Go up to ", "Go on to ", "Go on to ", "LADDER! Go up to ", "LADDER! Go up to ", "SNAKE! Go back to ", "Le stop at ", "Party at ", "Go on to ", "Pop into ", "SNAKE! Go back to ", "LADDER! Go up to ", "Go down to ", "Go on to ", "Go to ", "Stop in at ", "SNAKE! Go back to ", "Go on to ", "LADDER! Go up to ", "Tune up at ", "Party on to ", "SNAKE! Go back to ", "So close! Go to ", "Move closer to ", "SNAKE! Go back to ", "You made it! "]
 
 
 class TwitterDM
     def initialize()
         t = Time::new
+        t_is_on = (t < $t_end)
         
     ## Verify connection to Twitter API
 consumer_key = OAuth::Consumer.new(
@@ -81,8 +82,8 @@ $startmessages.each do |message|
         ## set message_to_tweet if don't find message in pasttweets
         message_to_tweet = case message
         when pasttweet then break
-        when $startmessages.last then message if t > $t_end
-        else message
+        when $startmessages.last then message if t_is_on == false
+        else message if t_is_on
         # end of message_to_tweet case
         end 
 
@@ -135,7 +136,7 @@ class TwitterTweet
     def initialize()
 
 t = Time::new
-t_is_over = (t > $t_end)
+t_is_on = (t < $t_end)
 t_25 = t + (25 * 60)
 t_local = t.localtime("+10:00")
 t_local_string = t_local.strftime(" %I:%M%p")
@@ -153,6 +154,12 @@ access_token = OAuth::Token.new(
 "yiXJmkrdheEi4PNGu4IS7WcX1tC9y9hDR06EFqOtIg2Gg")
 baseurl = "https://api.twitter.com"
 
+if t_is_on
+    warningtweet = "It's#{t_local_string} - you've got 1 minute to tweet '@pubquestbot n drinks' and a pic!"
+else warningtweet = "The game ended at at#{$t_end_local.strftime(" %I:%M%p")} - but you can party on if you feel like it. :)"
+# end of if t_is_on
+end
+
 ## Tweet that pubquest bot is about to wake
 ## up in 60 seconds
 ###################################
@@ -161,7 +168,7 @@ baseurl = "https://api.twitter.com"
                     thirdaddress = URI("#{baseurl}#{thirdpath}")
                     request = Net::HTTP::Post.new thirdaddress.request_uri
                     request.set_form_data(
-                      "status" => "It's#{t_local_string} - you've got 1 minute to tweet '@pubquestbot n drinks' and a pic!"
+                      "status" => "#{warningtweet}"
                     )
                     
                     # Set up HTTP.
@@ -185,10 +192,13 @@ baseurl = "https://api.twitter.com"
                     end
 
 sleep 60
-
+t = Time::new
+t_is_on = (t < $t_end)
+    if t_is_on
 ## Tweet that pubquest bot is awake
-## and reading tweets
+## and reading tweets IF THE GAME IS STILL ON
 ###################################
+
 
                     thirdpath    = "/1.1/statuses/update.json"
                     thirdaddress = URI("#{baseurl}#{thirdpath}")
@@ -261,17 +271,41 @@ if response.code == '200' then
 # end of response.code == '200'
 end
 
-puts "users_score = " + $users_score.to_s
+# puts "users_score = " + $users_score.to_s
 
 
 ## Run the search & tweet script for all 
 ## users in the user_list
 
 $users_list.each do |name, number|
-    puts "New loop: " + name
+#    puts "New loop: " + name
     name_freeze = name.freeze
-## Search User Timelines
 
+## Test to see if User account is active (has any tweets)
+testsecondpath = "/1.1/users/show.json"
+locationquery = URI.encode_www_form(
+    "screen_name" => name
+    )
+testsecondaddress = URI("#{baseurl}#{testsecondpath}?#{locationquery}")
+request = Net::HTTP::Get.new testsecondaddress.request_uri
+
+http             = Net::HTTP.new testsecondaddress.host, testsecondaddress.port
+http.use_ssl     = true
+http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+
+request.oauth! http, consumer_key, access_token
+http.start
+response = http.request request
+
+if response.code == '200' then
+    useraccount = JSON.parse(response.body)
+    useraccountactive = (useraccount["statuses_count"] >= 1)
+# end if response.code == '200'
+end
+
+if useraccountactive
+
+## Search User Timelines
 secondpath = "/1.1/statuses/user_timeline.json"
 userquery = URI.encode_www_form(
     "screen_name" => name,
@@ -325,7 +359,7 @@ if response.code == '200' then
             # time_to_go = wait_time - t
             # t_go = Time.at(time_to_go.to_i.abs).utc.strftime "%H:%M:%S"
             
-            if $users_score[name].to_i == 0
+            if $users_score[name].to_i == 1
                 $tweetout << "@#{name}#{t_local_string} Start the quest at #{$barnames[1]} - # 1"
                 $rollcount += 1
                 #   $users_last_time[name_freeze] = $t_start_local
@@ -376,7 +410,7 @@ if response.code == '200' then
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, drank #{word.to_i}#{botroll_talk}Move #{roll} to ##{[($users_score[name] + roll), 30].max}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on ##{$users_score[name]}, drank #{word.to_i}#{botroll_talk}Move #{roll} to ##{[($users_score[name] + roll), 30].min}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             $rollcount += 1
@@ -396,7 +430,7 @@ if response.code == '200' then
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, tried #{word.to_i} drinks (cheeky). Max is 4#{botroll_talk}Move #{roll} to ##{[($users_score[name] + roll), 30].max}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on ##{$users_score[name]}, tried #{word.to_i} drinks (cheeky). Max is 4#{botroll_talk}Move #{roll} to ##{[($users_score[name] + roll), 30].min}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             
             $users_score[name_freeze] = go_to_bar.to_i
             $users_last_time[name_freeze] = tweet_t
@@ -423,7 +457,7 @@ if response.code == '200' then
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, drank #{word.to_i}#{botroll_talk}Move #{roll} to ##{[($users_score[name] + roll), 30].max}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on ##{$users_score[name]}, drank #{word.to_i}#{botroll_talk}Move #{roll} to ##{[($users_score[name] + roll), 30].min}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             $rollcount += 1
@@ -434,7 +468,7 @@ if response.code == '200' then
                 go_to_barname = $barnames[go_to_bar]
                 go_to_bartalk = $barsnls[($users_score[name] + roll)]
 
-                $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]} but neither pic nor valid drink count! Move #{roll} to ##{[($users_score[name] + roll), 30].max}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+                $tweetout << "@#{name}#{t_local_string} on ##{$users_score[name]} but neither pic nor valid drink count! Move #{roll} to ##{[($users_score[name] + roll), 30].min}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
             $rollcount += 1
@@ -462,7 +496,7 @@ if response.code == '200' then
             go_to_bar = $bars[[($users_score[name] + roll), 30].min]
             go_to_barname = $barnames[go_to_bar]
             go_to_bartalk = $barsnls[($users_score[name] + roll)]
-            $tweetout << "@#{name}#{t_local_string} on #{$users_score[name]}, drank a min of 1! Move #{roll} to ##{[($users_score[name] + roll), 30].max}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
+            $tweetout << "@#{name}#{t_local_string} on ##{$users_score[name]}, drank a min of 1! Move #{roll} to ##{[($users_score[name] + roll), 30].min}: #{go_to_bartalk}#{go_to_barname} # #{go_to_bar}"
             
             $users_score[name_freeze] = go_to_bar.to_i
             # $users_last_time[name_freeze] = tweet_t
@@ -471,6 +505,8 @@ if response.code == '200' then
 
         # end of if $rollcount == 0
         end
+
+
 ## TWEET BACK THE TWEETOUT
 
 
@@ -502,24 +538,28 @@ if response.code == '200' then
                     end
                 
                 # puts "tweetout = " + $tweetout[0].to_s
-                puts "Users_score: " + name + " = " + $users_score[name].to_s
-                puts "**********************"
-                puts " "
+                # puts "Users_score: " + name + " = " + $users_score[name].to_s
+                # puts "**********************"
+                # puts " "
                 
             
-        ## sleep for 3 seconds, so don't get 429 code
+        ## sleep for 2 seconds, so don't get 429 code
            ############################
            sleep 2
            ############################
             
 
         # end of if response.code == '200'
+        end        
+        
+        # end if useraccountactive
+        else puts "Account not active - tweet something to activate"
         end
 
         #end of users.list.each
         end
 
-## TWEET SIGNOFF TWEET
+## TWEET SIGNOFF TWEET IF the GAME IS STILL ON
 
 
                     thirdpath    = "/1.1/statuses/update.json"
@@ -548,6 +588,9 @@ if response.code == '200' then
                       puts "Could not send the Tweet #{$tweetout[0]}! " +
                       "Code:#{response.code} Body:#{response.body}"
                     end
+        # end of "if t_is_on"
+                else puts "Game is over - no signoff tweet sent"
+                end
 
     # end of def initialize()
     end
