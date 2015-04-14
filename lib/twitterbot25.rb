@@ -10,7 +10,7 @@ require './config/environment'
 
 $t_start = Time.new(2015,4,17,17,30,0,"+10:00")
 $t_start_local = $t_start.localtime("+10:00") 
-$t_end = Time.new(2015,4,17,20,00,0,"+10:00")
+$t_end = Time.new(2015,4,15,12,00,0,"+10:00")
 $t_end_local = $t_end.localtime("+10:00") 
 $startmessages = ["Hi there...",
     "Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet me your drink count at each pub (max 4) AND A PHOTO", 
