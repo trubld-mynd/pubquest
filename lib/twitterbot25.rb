@@ -155,7 +155,7 @@ access_token = OAuth::Token.new(
 baseurl = "https://api.twitter.com"
 
 if t_is_on
-    warningtweet = "It's#{t_local_string} - you've got 1 minute to tweet '@pubquestbot n drinks' and a pic!"
+    warningtweet = "I'm waking up..."
 else warningtweet = "The game ended at at#{$t_end_local.strftime(" %I:%M%p")} - but you can party on if you feel like it. :)"
 # end of if t_is_on
 end
@@ -191,7 +191,7 @@ end
                       "Code:#{response.code} Body:#{response.body}"
                     end
 
-sleep 60
+sleep 2
 t = Time::new
 t_is_on = (t < $t_end)
     if t_is_on
