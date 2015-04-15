@@ -10,16 +10,16 @@ require './config/environment'
 
 $t_start = Time.new(2015,4,17,17,30,0,"+10:00")
 $t_start_local = $t_start.localtime("+10:00") 
-$t_end = Time.new(2015,4,15,12,00,0,"+10:00")
+$t_end = Time.new(2015,4,17,20,30,0,"+10:00")
 $t_end_local = $t_end.localtime("+10:00") 
 $startmessages = ["Hi there...",
     "Welcome to Snakes N Ladders Pub Quest! I am the Pub Questbot. Tweet me your drink count at each pub (max 4) AND A PHOTO", 
-       "E.g. if your team has had 3 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 3 drinks'. Don't forget the pic!",
+       "E.g. if your team has had 4 drinks, take a photo of your team with the drinks, and tweet '@pubquestbot 4 drinks'. Don't forget the pic!",
        "Your move will be determined by your 'dice roll' (your drink count +/-1). E.g. your 3 drinks might move you 2, 3 or 4 spaces on the board.",
        "I will then tell you where to go (If you land on a snake/ladder, I'll send you straight to the bottom/top of it).",
        "I'm only awake every 25 mins. Make sure your tweet to me is the last thing you tweet to anyone before I wake, or I'll give you a roll of 1.",
        "Tweeting more than 4 drinks will land you a 1 point penalty - you'd get 2, 3 or 4 instead of 3, 4 or 5.",
-       "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest in 2.5 hours.",
+       "The winner will be the first to roll on to Frankie's, OR the team that gets the furtherest before the pubquest ends.",
        "I will start the pubquest at#{$t_start_local.strftime(" %I:%M%p")} and finish at#{$t_end_local.strftime(" %I:%M%p")} local time.",
        "Check out the Snakes N Ladders map, and a copy of these rules, at the website http://www.pubquest.info",
         "LET THE GAMES BEGIN!",
